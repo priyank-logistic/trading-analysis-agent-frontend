@@ -1,0 +1,87 @@
+{
+  "marketTypes": [
+    { "value": "crypto", "label": "Cryptocurrency" },
+    { "value": "indian", "label": "Indian Market" }
+  ],
+  "cryptoCoins": [
+    { "value": "BTCUSDT", "label": "Bitcoin (BTCUSDT)" },
+    { "value": "ETHUSDT", "label": "Ethereum (ETHUSDT)" },
+    { "value": "BNBUSDT", "label": "Binance Coin (BNBUSDT)" },
+    { "value": "SOLUSDT", "label": "Solana (SOLUSDT)" },
+    { "value": "XRPUSDT", "label": "Ripple (XRPUSDT)" },
+    { "value": "ADAUSDT", "label": "Cardano (ADAUSDT)" },
+    { "value": "DOGEUSDT", "label": "Dogecoin (DOGEUSDT)" },
+    { "value": "DOTUSDT", "label": "Polkadot (DOTUSDT)" },
+    { "value": "MATICUSDT", "label": "Polygon (MATICUSDT)" },
+    { "value": "LTCUSDT", "label": "Litecoin (LTCUSDT)" }
+  ],
+  "indianIndices": [
+    { "value": "NIFTY50", "label": "Nifty 50" },
+    { "value": "BANKNIFTY", "label": "Bank Nifty" }
+  ],
+  "indianStocks": [
+    { "value": "TCS", "label": "TCS" },
+    { "value": "NTPC", "label": "NTPC" },
+    { "value": "JSWSTEEL", "label": "JSW Steel" },
+    { "value": "BHARTIARTL", "label": "Bharti Airtel" },
+    { "value": "DIVISLAB", "label": "Divis Laboratories" },
+    { "value": "LT", "label": "Larsen & Toubro" },
+    { "value": "ULTRACEMCO", "label": "UltraTech Cement" },
+    { "value": "HDFCBANK", "label": "HDFC Bank" },
+    { "value": "HEROMOTOCO", "label": "Hero MotoCorp" },
+    { "value": "TECHM", "label": "Tech Mahindra" },
+    { "value": "GRASIM", "label": "Grasim Industries" },
+    { "value": "HINDALCO", "label": "Hindalco Industries" },
+    { "value": "HINDUNILVR", "label": "Hindustan Unilever" },
+    { "value": "MARUTI", "label": "Maruti Suzuki" },
+    { "value": "BAJAJFINSV", "label": "Bajaj Finserv" },
+    { "value": "COALINDIA", "label": "Coal India" },
+    { "value": "ASIANPAINT", "label": "Asian Paints" },
+    { "value": "APOLLOHOSP", "label": "Apollo Hospitals" },
+    { "value": "RELIANCE", "label": "Reliance Industries" },
+    { "value": "M&M", "label": "Mahindra & Mahindra" },
+    { "value": "SBILIFE", "label": "SBI Life Insurance" },
+    { "value": "POWERGRID", "label": "Power Grid Corporation" },
+    { "value": "IOC", "label": "Indian Oil Corporation" },
+    { "value": "ITC", "label": "ITC" },
+    { "value": "NESTLEIND", "label": "Nestle India" },
+    { "value": "BAJAJ-AUTO", "label": "Bajaj Auto" },
+    { "value": "INFY", "label": "Infosys" },
+    { "value": "KOTAKBANK", "label": "Kotak Mahindra Bank" },
+    { "value": "ADANIENT", "label": "Adani Enterprises" },
+    { "value": "ONGC", "label": "Oil & Natural Gas Corp" },
+    { "value": "ADANIPORTS", "label": "Adani Ports" },
+    { "value": "BAJFINANCE", "label": "Bajaj Finance" },
+    { "value": "TATACONSUM", "label": "Tata Consumer Products" },
+    { "value": "HDFCLIFE", "label": "HDFC Life Insurance" },
+    { "value": "SUNPHARMA", "label": "Sun Pharmaceutical" },
+    { "value": "BEL", "label": "Bharat Electronics" },
+    { "value": "AXISBANK", "label": "Axis Bank" },
+    { "value": "SBIN", "label": "State Bank of India" },
+    { "value": "TITAN", "label": "Titan Company" },
+    { "value": "WIPRO", "label": "Wipro" },
+    { "value": "BPCL", "label": "Bharat Petroleum" },
+    { "value": "HCLTECH", "label": "HCL Technologies" },
+    { "value": "EICHERMOT", "label": "Eicher Motors" },
+    { "value": "INDUSINDBK", "label": "IndusInd Bank" },
+    { "value": "BRITANNIA", "label": "Britannia Industries" },
+    { "value": "CIPLA", "label": "Cipla" },
+    { "value": "TATAMOTORS", "label": "Tata Motors" },
+    { "value": "DRREDDY", "label": "Dr. Reddy's Laboratories" },
+    { "value": "TATASTEEL", "label": "Tata Steel" },
+    { "value": "ICICIBANK", "label": "ICICI Bank" }
+  ],
+  "timeframes": {
+    "higher": [
+      { "value": "1h", "label": "1 Hour" },
+      { "value": "4h", "label": "4 Hours" },
+      { "value": "1d", "label": "1 Day" }
+    ],
+    "lower": [
+      { "value": "1m", "label": "1 Minute" },
+      { "value": "5m", "label": "5 Minutes" },
+      { "value": "15m", "label": "15 Minutes" },
+      { "value": "1h", "label": "1 Hour" }
+    ]
+  }
+}

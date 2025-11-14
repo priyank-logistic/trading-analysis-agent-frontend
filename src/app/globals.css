@@ -107,6 +107,19 @@ body {
   border-color: #3b82f6;
 }
 
+/* MUI Select styling to match form-group */
+.form-group .MuiFormControl-root {
+  margin: 0;
+}
+
+.form-group .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.form-group .MuiInputLabel-root {
+  font-size: 0.95em;
+}
+
 .btn {
   width: 100%;
   padding: 15px;
