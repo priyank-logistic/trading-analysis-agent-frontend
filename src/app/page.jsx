@@ -29,6 +29,8 @@ export default function Home() {
     "Select coin and timeframes to analyze"
   );
   const [showResults, setShowResults] = useState(false);
+  const backendUrl = "https://trading-analysis-agent.onrender.com/analyze";
+  // const backendUrl = "http://localhost:8001/analyze";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/analyze", {
+      const response = await fetch(backendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
