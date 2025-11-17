@@ -160,7 +160,7 @@ export default function Home() {
     "Select coin and timeframes to analyze"
   );
   const [showResults, setShowResults] = useState(false);
-  const backendUrl = "https://trading-analysis-agent.onrender.com/analyze";
+  const backendUrl = "https://ai.tradeonair.com/analyze";
   // const backendUrl = "http://localhost:8000/analyze";
 
   const handleSubmit = async (e) => {
