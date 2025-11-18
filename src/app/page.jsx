@@ -10,6 +10,7 @@ import {
   TextField,
   ThemeProvider,
   createTheme,
+  Autocomplete,
 } from "@mui/material";
 import SMCAnalysis from "@/components/SMCAnalysis";
 import TradingSetups from "@/components/TradingSetups";
@@ -136,6 +137,58 @@ const darkTheme = createTheme({
         },
       },
     },
+    MuiAutocomplete: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            backgroundColor: "#2a2f3e",
+            color: "#fff",
+            "& fieldset": {
+              borderColor: "#374151",
+            },
+            "&:hover fieldset": {
+              borderColor: "#3b82f6",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#3b82f6",
+            },
+          },
+          "& .MuiInputLabel-root": {
+            color: "#d1d5db",
+            "&.Mui-focused": {
+              color: "#3b82f6",
+            },
+          },
+        },
+        listbox: {
+          backgroundColor: "#2a2f3e",
+          color: "#fff",
+          "& .MuiAutocomplete-option": {
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#374151",
+            },
+            "&[aria-selected='true']": {
+              backgroundColor: "#3b82f6",
+              "&:hover": {
+                backgroundColor: "#2563eb",
+              },
+            },
+          },
+          "& .MuiAutocomplete-groupLabel": {
+            backgroundColor: "#1a1f2e",
+            color: "#9ca3af",
+            fontWeight: 600,
+          },
+        },
+        popper: {
+          "& .MuiPaper-root": {
+            backgroundColor: "#2a2f3e",
+            color: "#fff",
+          },
+        },
+      },
+    },
   },
 });
 
@@ -160,8 +213,8 @@ export default function Home() {
     "Select coin and timeframes to analyze"
   );
   const [showResults, setShowResults] = useState(false);
-  const backendUrl = "https://ai.tradeonair.com/analyze";
-  // const backendUrl = "http://localhost:8000/analyze";
+  // const backendUrl = "https://ai.tradeonair.com/analyze";
+  const backendUrl = "http://localhost:8000/analyze";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -297,50 +350,73 @@ export default function Home() {
               </div>
 
               <div className="form-group">
-                <FormControl fullWidth required variant="outlined">
-                  <InputLabel id="coin-label">
-                    {marketType === "indian"
-                      ? "Indian Index"
-                      : "Cryptocurrency"}
-                  </InputLabel>
-                  <Select
-                    labelId="coin-label"
-                    id="coin"
-                    name="coin"
-                    value={coin}
-                    label={
-                      marketType === "indian"
-                        ? "Indian Index"
-                        : "Cryptocurrency"
+                {marketType === "indian" ? (
+                  <Autocomplete
+                    id="coin-autocomplete"
+                    options={[
+                      ...dropdownData.indianIndices.map((item) => ({
+                        ...item,
+                        group: "Indices",
+                      })),
+                      ...dropdownData.indianStocks.map((item) => ({
+                        ...item,
+                        group: "Stocks",
+                      })),
+                    ]}
+                    groupBy={(option) => option.group}
+                    getOptionLabel={(option) => option.label || ""}
+                    isOptionEqualToValue={(option, value) =>
+                      option.value === value.value
                     }
-                    onChange={(e) => setCoin(e.target.value)}
-                  >
-                    {marketType === "indian"
-                      ? [
-                          <ListSubheader key="indices-header">
-                            Indices
-                          </ListSubheader>,
-                          ...dropdownData.indianIndices.map((item) => (
-                            <MenuItem key={item.value} value={item.value}>
-                              {item.label}
-                            </MenuItem>
-                          )),
-                          <ListSubheader key="stocks-header">
-                            Stocks
-                          </ListSubheader>,
-                          ...dropdownData.indianStocks.map((item) => (
-                            <MenuItem key={item.value} value={item.value}>
-                              {item.label}
-                            </MenuItem>
-                          )),
-                        ]
-                      : dropdownData.cryptoCoins.map((item) => (
-                          <MenuItem key={item.value} value={item.value}>
-                            {item.label}
-                          </MenuItem>
-                        ))}
-                  </Select>
-                </FormControl>
+                    value={
+                      [
+                        ...dropdownData.indianIndices,
+                        ...dropdownData.indianStocks,
+                      ].find((item) => item.value === coin) || null
+                    }
+                    onChange={(event, newValue) => {
+                      if (newValue) {
+                        setCoin(newValue.value);
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Stock/Index"
+                        required
+                        variant="outlined"
+                      />
+                    )}
+                    filterOptions={(options, { inputValue }) => {
+                      if (!inputValue) return options;
+                      const searchTerm = inputValue.toLowerCase();
+                      return options.filter(
+                        (option) =>
+                          option.label.toLowerCase().includes(searchTerm) ||
+                          option.value.toLowerCase().includes(searchTerm)
+                      );
+                    }}
+                    fullWidth
+                  />
+                ) : (
+                  <FormControl fullWidth required variant="outlined">
+                    <InputLabel id="coin-label">Cryptocurrency</InputLabel>
+                    <Select
+                      labelId="coin-label"
+                      id="coin"
+                      name="coin"
+                      value={coin}
+                      label="Cryptocurrency"
+                      onChange={(e) => setCoin(e.target.value)}
+                    >
+                      {dropdownData.cryptoCoins.map((item) => (
+                        <MenuItem key={item.value} value={item.value}>
+                          {item.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
               </div>
 
               <div className="form-group">
