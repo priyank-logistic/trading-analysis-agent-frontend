@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Select,
   MenuItem,
@@ -192,8 +192,145 @@ const darkTheme = createTheme({
   },
 });
 
+const LOADING_STEPS = [
+  { icon: "📥", label: "Gathering Market Information", color: "#3b82f6" },
+  { icon: "📊", label: "Organizing Data", color: "#8b5cf6" },
+  { icon: "📤", label: "Preparing AI Analysis", color: "#10b981" },
+  { icon: "🤖", label: "Analyzing Patterns", color: "#f59e0b" },
+  { icon: "✨", label: "Finalizing Report", color: "#ef4444" },
+];
+
+function LoadingAnimation({ responseReady, onComplete }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const progressIntervalRef = useRef(null);
+  const stepIntervalRef = useRef(null);
+
+  useEffect(() => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
+
+    if (responseReady) {
+      progressIntervalRef.current = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(progressIntervalRef.current);
+            return 100;
+          }
+          return prev + 5;
+        });
+      }, 50);
+
+      stepIntervalRef.current = setInterval(() => {
+        setCurrentStep((prev) => {
+          if (prev >= LOADING_STEPS.length - 1) {
+            clearInterval(stepIntervalRef.current);
+            setTimeout(() => {
+              if (onComplete) onComplete();
+            }, 300);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 200);
+    } else {
+      progressIntervalRef.current = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressIntervalRef.current);
+            return 95;
+          }
+          return prev + 0.158;
+        });
+      }, 100);
+
+      stepIntervalRef.current = setInterval(() => {
+        setCurrentStep((prev) => {
+          if (prev >= LOADING_STEPS.length - 1) {
+            clearInterval(stepIntervalRef.current);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 12000);
+    }
+
+    return () => {
+      if (progressIntervalRef.current)
+        clearInterval(progressIntervalRef.current);
+      if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
+    };
+  }, [responseReady, onComplete]);
+
+  return (
+    <div className="loading-animation">
+      <div className="loading-header">
+        <h3>Processing Your Request</h3>
+        <div className="progress-bar-container">
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <span className="progress-text">{Math.round(progress)}%</span>
+        </div>
+      </div>
+      <div className="loading-steps">
+        {LOADING_STEPS.map((step, index) => (
+          <div
+            key={index}
+            className={`loading-step ${
+              index === currentStep
+                ? "active"
+                : index < currentStep
+                ? "completed"
+                : ""
+            }`}
+          >
+            <div
+              className="step-icon"
+              style={{
+                backgroundColor:
+                  index <= currentStep
+                    ? `${step.color}20`
+                    : "rgba(255, 255, 255, 0.05)",
+                borderColor:
+                  index <= currentStep
+                    ? step.color
+                    : "rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "1.8em",
+                  filter:
+                    index <= currentStep
+                      ? "drop-shadow(0 0 8px " + step.color + ")"
+                      : "none",
+                }}
+              >
+                {step.icon}
+              </span>
+              {index < currentStep && <div className="checkmark">✓</div>}
+            </div>
+            <div className="step-label">{step.label}</div>
+            {index < LOADING_STEPS.length - 1 && (
+              <div
+                className={`step-connector ${
+                  index < currentStep ? "completed" : ""
+                }`}
+              ></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [marketType, setMarketType] = useState("crypto"); // "crypto" or "indian"
+  const [marketType, setMarketType] = useState("crypto");
   const [coin, setCoin] = useState("BTCUSDT");
   const [higherTimeframe, setHigherTimeframe] = useState("4h");
   const [lowerTimeframe, setLowerTimeframe] = useState("15m");
@@ -213,6 +350,8 @@ export default function Home() {
     "Select coin and timeframes to analyze"
   );
   const [showResults, setShowResults] = useState(false);
+  const [responseReady, setResponseReady] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
   const backendUrl = "https://ai.tradeonair.com/analyze";
   // const backendUrl = "http://localhost:8000/analyze";
 
@@ -220,6 +359,8 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     setShowResults(false);
+    setResponseReady(false);
+    setAnimationComplete(false);
 
     const formData = {
       coin: coin.toUpperCase(),
@@ -285,14 +426,26 @@ export default function Home() {
         `Higher: ${higherTimeframe.toUpperCase()} | Lower: ${lowerTimeframe.toUpperCase()} | ${limit} Candles`
       );
 
-      setLoading(false);
-      setShowResults(true);
-      setActiveTab("price");
+      setResponseReady(true);
     } catch (error) {
       setLoading(false);
+      setResponseReady(false);
+      setAnimationComplete(false);
       console.error("Error:", error);
     }
   };
+
+  useEffect(() => {
+    if (animationComplete && responseReady) {
+      setTimeout(() => {
+        setLoading(false);
+        setShowResults(true);
+        setActiveTab("price");
+        setResponseReady(false);
+        setAnimationComplete(false);
+      }, 500);
+    }
+  }, [animationComplete, responseReady]);
 
   const copyRawResponse = () => {
     if (rawResponse) {
@@ -332,7 +485,6 @@ export default function Home() {
                     label="Market Type"
                     onChange={(e) => {
                       setMarketType(e.target.value);
-                      // Reset coin when switching market type
                       if (e.target.value === "indian") {
                         setCoin("NIFTY50");
                       } else {
@@ -492,10 +644,10 @@ export default function Home() {
           </form>
 
           {loading && (
-            <div className="loading" style={{ display: "block" }}>
-              <div className="spinner"></div>
-              <p>AI is analyzing the market data...</p>
-            </div>
+            <LoadingAnimation
+              responseReady={responseReady}
+              onComplete={() => setAnimationComplete(true)}
+            />
           )}
         </div>
 
