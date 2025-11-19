@@ -622,14 +622,20 @@ export default function Home() {
                   label="Number of Candles"
                   type="number"
                   value={limit}
-                  onChange={(e) => setLimit(Number(e.target.value) || "")}
+                  onChange={(e) => {
+                    const value = Number(e.target.value) || "";
+                    if (value === "" || (value >= 1 && value <= 500)) {
+                      setLimit(value);
+                    }
+                  }}
                   inputProps={{
                     min: 1,
-                    max: 1000,
+                    max: 500,
                   }}
                   required
                   fullWidth
                   variant="outlined"
+                  helperText="Maximum 500 candles allowed"
                 />
               </div>
             </div>

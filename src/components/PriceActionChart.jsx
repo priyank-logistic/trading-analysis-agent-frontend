@@ -7,11 +7,37 @@ import {
   CandlestickSeries,
   LineSeries,
 } from "lightweight-charts";
+import { EMA } from "technicalindicators";
+
+// Calculate EMA using technicalindicators library
+function calculateEMA(data, period) {
+  if (!data || data.length === 0) return [];
+  if (data.length < period) return [];
+
+  const closes = data.map((d) => d.close);
+
+  try {
+    const emaValues = EMA.calculate({ values: closes, period });
+
+    // Map indicator values back to time series data
+    // Note: Technical indicators usually return fewer values than input
+    const offset = data.length - emaValues.length;
+    return emaValues.map((value, index) => ({
+      time: data[offset + index].time,
+      value: value,
+    }));
+  } catch (error) {
+    console.error("Error calculating EMA:", error);
+    return [];
+  }
+}
 
 export default function PriceActionChart({
   priceData,
   supportLevels,
   resistanceLevels,
+  showEMA = true,
+  emaPeriods = [9, 21, 50], // Default EMA periods
 }) {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
@@ -107,6 +133,32 @@ export default function PriceActionChart({
 
     candlestickSeries.setData(formattedData);
 
+    // Add EMA indicators if enabled
+    if (showEMA && emaPeriods && emaPeriods.length > 0) {
+      const emaColors = [
+        "#3b82f6", // Blue for EMA 9
+        "#8b5cf6", // Purple for EMA 21
+        "#f59e0b", // Orange for EMA 50
+        "#10b981", // Green for EMA 100
+        "#ef4444", // Red for EMA 200
+      ];
+
+      emaPeriods.forEach((period, index) => {
+        const emaData = calculateEMA(formattedData, period);
+        if (emaData.length > 0) {
+          const emaSeries = chart.addSeries(LineSeries, {
+            color: emaColors[index % emaColors.length],
+            lineWidth: 2,
+            lineStyle: 0, // Solid line
+            title: `EMA ${period}`,
+            priceLineVisible: false,
+            lastValueVisible: true,
+          });
+          emaSeries.setData(emaData);
+        }
+      });
+    }
+
     const supportPrices = supportLevels
       ? supportLevels
           .map((s) => {
@@ -170,7 +222,7 @@ export default function PriceActionChart({
         candlestickSeriesRef.current = null;
       }
     };
-  }, [priceData, supportLevels, resistanceLevels]);
+  }, [priceData, supportLevels, resistanceLevels, showEMA, emaPeriods]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -210,16 +262,70 @@ export default function PriceActionChart({
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
       }}
     >
-      <h2
+      <div
         style={{
-          color: "#fff",
-          fontSize: "1.5em",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           marginBottom: "20px",
-          fontWeight: 600,
         }}
       >
-        Price Action Chart
-      </h2>
+        <h2
+          style={{
+            color: "#fff",
+            fontSize: "1.5em",
+            fontWeight: 600,
+            margin: 0,
+          }}
+        >
+          Price Action Chart
+        </h2>
+        {showEMA && emaPeriods && emaPeriods.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              gap: "15px",
+              flexWrap: "wrap",
+            }}
+          >
+            {emaPeriods.map((period, index) => {
+              const emaColors = [
+                "#3b82f6",
+                "#8b5cf6",
+                "#f59e0b",
+                "#10b981",
+                "#ef4444",
+              ];
+              return (
+                <div
+                  key={period}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "20px",
+                      height: "2px",
+                      backgroundColor: emaColors[index % emaColors.length],
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: "0.85em",
+                    }}
+                  >
+                    EMA {period}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
       <div
         ref={chartContainerRef}
         style={{
