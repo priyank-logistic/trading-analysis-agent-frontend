@@ -200,7 +200,7 @@ const LOADING_STEPS = [
   { icon: "✨", label: "Finalizing Report", color: "#ef4444" },
 ];
 
-function LoadingAnimation({ responseReady, onComplete }) {
+function LoadingAnimation({ responseReady, onComplete, onCancel }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const progressIntervalRef = useRef(null);
@@ -265,7 +265,36 @@ function LoadingAnimation({ responseReady, onComplete }) {
   return (
     <div className="loading-animation">
       <div className="loading-header">
-        <h3>Processing Your Request</h3>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <h3>Processing Your Request</h3>
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#ef4444",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "background-color 0.2s",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#dc2626")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#ef4444")}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
         <div className="progress-bar-container">
           <div className="progress-bar">
             <div
@@ -334,7 +363,7 @@ export default function Home() {
   const [coin, setCoin] = useState("BTCUSDT");
   const [higherTimeframe, setHigherTimeframe] = useState("4h");
   const [lowerTimeframe, setLowerTimeframe] = useState("15m");
-  const [limit, setLimit] = useState(30);
+  const [limit, setLimit] = useState(100);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("price");
   const [rawResponse, setRawResponse] = useState(null);
@@ -352,8 +381,33 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [responseReady, setResponseReady] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const abortControllerRef = useRef(null);
+
   const backendUrl = "https://ai.tradeonair.com/analyze";
+  const cancelUrl = "https://ai.tradeonair.com/cancel";
   // const backendUrl = "http://localhost:8000/analyze";
+  // const cancelUrl = "http://localhost:8000/cancel";
+
+  const handleCancel = async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    try {
+      await fetch(cancelUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.log("Cancel request sent (backend may have already stopped)");
+    }
+
+    setLoading(false);
+    setShowResults(false);
+    setResponseReady(false);
+    setAnimationComplete(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -361,6 +415,8 @@ export default function Home() {
     setShowResults(false);
     setResponseReady(false);
     setAnimationComplete(false);
+
+    abortControllerRef.current = new AbortController();
 
     const formData = {
       coin: coin.toUpperCase(),
@@ -375,6 +431,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        signal: abortControllerRef.current.signal,
       });
 
       if (!response.ok) {
@@ -427,11 +484,16 @@ export default function Home() {
       );
 
       setResponseReady(true);
+      abortControllerRef.current = null;
     } catch (error) {
-      setLoading(false);
-      setResponseReady(false);
-      setAnimationComplete(false);
-      console.error("Error:", error);
+      if (error.name === "AbortError") {
+        console.log("Request cancelled by user");
+      } else {
+        setLoading(false);
+        setResponseReady(false);
+        setAnimationComplete(false);
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -653,6 +715,7 @@ export default function Home() {
             <LoadingAnimation
               responseReady={responseReady}
               onComplete={() => setAnimationComplete(true)}
+              onCancel={handleCancel}
             />
           )}
         </div>
