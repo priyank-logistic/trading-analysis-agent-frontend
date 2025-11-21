@@ -202,25 +202,12 @@ const LOADING_STEPS = [
 
 function LoadingAnimation({ responseReady, onComplete, onCancel }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const progressIntervalRef = useRef(null);
   const stepIntervalRef = useRef(null);
 
   useEffect(() => {
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
 
     if (responseReady) {
-      progressIntervalRef.current = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(progressIntervalRef.current);
-            return 100;
-          }
-          return prev + 5;
-        });
-      }, 50);
-
       stepIntervalRef.current = setInterval(() => {
         setCurrentStep((prev) => {
           if (prev >= LOADING_STEPS.length - 1) {
@@ -234,16 +221,6 @@ function LoadingAnimation({ responseReady, onComplete, onCancel }) {
         });
       }, 200);
     } else {
-      progressIntervalRef.current = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressIntervalRef.current);
-            return 95;
-          }
-          return prev + 0.158;
-        });
-      }, 100);
-
       stepIntervalRef.current = setInterval(() => {
         setCurrentStep((prev) => {
           if (prev >= LOADING_STEPS.length - 1) {
@@ -256,8 +233,6 @@ function LoadingAnimation({ responseReady, onComplete, onCancel }) {
     }
 
     return () => {
-      if (progressIntervalRef.current)
-        clearInterval(progressIntervalRef.current);
       if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
     };
   }, [responseReady, onComplete]);
@@ -265,45 +240,7 @@ function LoadingAnimation({ responseReady, onComplete, onCancel }) {
   return (
     <div className="loading-animation">
       <div className="loading-header">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <h3>Processing Your Request</h3>
-          {onCancel && (
-            <button
-              onClick={onCancel}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "#ef4444",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: "500",
-                transition: "background-color 0.2s",
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#dc2626")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#ef4444")}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-        <div className="progress-bar-container">
-          <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <span className="progress-text">{Math.round(progress)}%</span>
-        </div>
+        <h3>Processing Your Request</h3>
       </div>
       <div className="loading-steps">
         {LOADING_STEPS.map((step, index) => (
@@ -354,6 +291,41 @@ function LoadingAnimation({ responseReady, onComplete, onCancel }) {
           </div>
         ))}
       </div>
+      {onCancel && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "40px",
+          }}
+        >
+          <button
+            onClick={onCancel}
+            style={{
+              padding: "16px 32px",
+              backgroundColor: "#ef4444",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "18px",
+              fontWeight: "600",
+              transition: "background-color 0.2s, transform 0.1s",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = "#dc2626";
+              e.target.style.transform = "scale(1.05)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = "#ef4444";
+              e.target.style.transform = "scale(1)";
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

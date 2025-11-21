@@ -330,7 +330,7 @@ export default function PriceActionChart({
         ref={chartContainerRef}
         style={{
           width: "100%",
-          height: "500px",
+          height: "900px",
           position: "relative",
         }}
       />
