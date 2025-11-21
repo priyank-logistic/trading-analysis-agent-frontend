@@ -346,7 +346,7 @@ export default function Home() {
   const [priceActionDetail, setPriceActionDetail] = useState(null);
   const [technicalIndicatorsAnalysis, setTechnicalIndicatorsAnalysis] =
     useState(null);
-  const [coinTitle, setCoinTitle] = useState("📊 Crypto SMC Analysis");
+  const [coinTitle, setCoinTitle] = useState("📊 SMC Analysis");
   const [timeframeInfo, setTimeframeInfo] = useState(
     "Select coin and timeframes to analyze"
   );
