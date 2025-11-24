@@ -17,7 +17,8 @@ import TradingSetups from "@/components/TradingSetups";
 import PriceActionChart from "@/components/PriceActionChart";
 import MarketAnalysis from "@/components/MarketAnalysis";
 import PriceActionDetail from "@/components/PriceActionDetail";
-import { parseAnalysis } from "@/lib/utils";
+import SavedAnalyses from "@/components/SavedAnalyses";
+import { parseAnalysis, saveAnalysisToStorage } from "@/lib/utils";
 import dropdownData from "@/lib/dropdownData.json";
 
 const darkTheme = createTheme({
@@ -355,10 +356,10 @@ export default function Home() {
   const [animationComplete, setAnimationComplete] = useState(false);
   const abortControllerRef = useRef(null);
 
-  const backendUrl = "https://ai.tradeonair.com/analyze";
-  const cancelUrl = "https://ai.tradeonair.com/cancel";
-  // const backendUrl = "http://localhost:8000/analyze";
-  // const cancelUrl = "http://localhost:8000/cancel";
+  // const backendUrl = "https://ai.tradeonair.com/analyze";
+  // const cancelUrl = "https://ai.tradeonair.com/cancel";
+  const backendUrl = "http://localhost:8000/analyze";
+  const cancelUrl = "http://localhost:8000/cancel";
 
   const handleCancel = async () => {
     if (abortControllerRef.current) {
@@ -477,9 +478,47 @@ export default function Home() {
         setActiveTab("price");
         setResponseReady(false);
         setAnimationComplete(false);
+
+        // Save analysis to local storage
+        if (rawResponse && analysisData) {
+          const analysisToSave = {
+            coin: coin.toUpperCase(),
+            marketType: marketType,
+            higherTimeframe: higherTimeframe,
+            lowerTimeframe: lowerTimeframe,
+            limit: limit,
+            coinTitle: coinTitle,
+            timeframeInfo: timeframeInfo,
+            rawResponse: rawResponse,
+            analysisData: analysisData,
+            priceData: priceData,
+            marketAnalysisData: marketAnalysisData,
+            technicalIndicators: technicalIndicators,
+            priceActionDetail: priceActionDetail,
+            technicalIndicatorsAnalysis: technicalIndicatorsAnalysis,
+          };
+          saveAnalysisToStorage(analysisToSave);
+        }
       }, 500);
     }
-  }, [animationComplete, responseReady]);
+  }, [
+    animationComplete,
+    responseReady,
+    rawResponse,
+    analysisData,
+    coin,
+    marketType,
+    higherTimeframe,
+    lowerTimeframe,
+    limit,
+    coinTitle,
+    timeframeInfo,
+    priceData,
+    marketAnalysisData,
+    technicalIndicators,
+    priceActionDetail,
+    technicalIndicatorsAnalysis,
+  ]);
 
   const copyRawResponse = () => {
     if (rawResponse) {
@@ -495,6 +534,69 @@ export default function Home() {
     }
   };
 
+  const handleLoadAnalysis = (savedAnalysis) => {
+    // Open new tab with analysis ID as URL parameter
+    const analysisId = savedAnalysis.id;
+    const newUrl = `${window.location.origin}${window.location.pathname}?loadAnalysis=${analysisId}`;
+    window.open(newUrl, "_blank");
+  };
+
+  // Load analysis from URL parameter on component mount (for new tabs)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const analysisId = urlParams.get("loadAnalysis");
+
+    if (analysisId) {
+      try {
+        // Get all saved analyses from localStorage
+        const analyses = JSON.parse(
+          localStorage.getItem("crypto_analyses") || "[]"
+        );
+        const savedAnalysis = analyses.find((a) => a.id === analysisId);
+
+        if (savedAnalysis) {
+          // Restore all analysis data from saved analysis
+          setCoin(savedAnalysis.coin || coin);
+          setMarketType(savedAnalysis.marketType || marketType);
+          setHigherTimeframe(savedAnalysis.higherTimeframe || higherTimeframe);
+          setLowerTimeframe(savedAnalysis.lowerTimeframe || lowerTimeframe);
+          setLimit(savedAnalysis.limit || limit);
+          setCoinTitle(savedAnalysis.coinTitle || coinTitle);
+          setTimeframeInfo(savedAnalysis.timeframeInfo || timeframeInfo);
+          setRawResponse(savedAnalysis.rawResponse || null);
+          setAnalysisData(savedAnalysis.analysisData || null);
+          setPriceData(savedAnalysis.priceData || null);
+          setMarketAnalysisData(savedAnalysis.marketAnalysisData || null);
+          setTechnicalIndicators(savedAnalysis.technicalIndicators || null);
+          setPriceActionDetail(savedAnalysis.priceActionDetail || null);
+          setTechnicalIndicatorsAnalysis(
+            savedAnalysis.technicalIndicatorsAnalysis || null
+          );
+          setShowResults(true);
+          setActiveTab("price");
+
+          // Clean up URL parameter
+          window.history.replaceState({}, "", window.location.pathname);
+
+          // Scroll to results after a short delay
+          setTimeout(() => {
+            const resultsContainer =
+              document.getElementById("resultsContainer");
+            if (resultsContainer) {
+              resultsContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          }, 300);
+        }
+      } catch (error) {
+        console.error("Failed to load analysis:", error);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
+
   return (
     <ThemeProvider theme={darkTheme}>
       <div className="container">
@@ -504,6 +606,8 @@ export default function Home() {
             {timeframeInfo}
           </div>
         </div>
+
+        {!showResults && <SavedAnalyses onLoadAnalysis={handleLoadAnalysis} />}
 
         <div className="form-section">
           <form id="analysisForm" onSubmit={handleSubmit}>
@@ -824,6 +928,8 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {showResults && <SavedAnalyses onLoadAnalysis={handleLoadAnalysis} />}
       </div>
     </ThemeProvider>
   );

@@ -98,3 +98,84 @@ export function parseAnalysis(text) {
 
   return data;
 }
+
+// Local Storage utilities for saving analyses
+const STORAGE_KEY = "crypto_analyses";
+
+export function saveAnalysisToStorage(analysisData) {
+  try {
+    const analyses = getAnalysesFromStorage();
+
+    // Check if an analysis with the same coin, marketType, and timeframes exists
+    const existingIndex = analyses.findIndex((analysis) => {
+      return (
+        analysis.coin?.toUpperCase() === analysisData.coin?.toUpperCase() &&
+        analysis.marketType === analysisData.marketType &&
+        analysis.higherTimeframe === analysisData.higherTimeframe &&
+        analysis.lowerTimeframe === analysisData.lowerTimeframe
+      );
+    });
+
+    if (existingIndex !== -1) {
+      // Update existing analysis
+      const existingAnalysis = analyses[existingIndex];
+      analyses[existingIndex] = {
+        ...existingAnalysis,
+        ...analysisData,
+        id: existingAnalysis.id, // Keep the same ID
+        timestamp: new Date().toISOString(), // Update timestamp
+      };
+      // Move updated analysis to the beginning
+      const updatedAnalysis = analyses.splice(existingIndex, 1)[0];
+      analyses.unshift(updatedAnalysis);
+    } else {
+      // Add new analysis
+      const newAnalysis = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        ...analysisData,
+      };
+      analyses.unshift(newAnalysis); // Add to beginning
+    }
+
+    // Keep only last 50 analyses
+    const limitedAnalyses = analyses.slice(0, 50);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(limitedAnalyses));
+    return existingIndex !== -1 ? analyses[0].id : analyses[0].id;
+  } catch (error) {
+    console.error("Failed to save analysis to storage:", error);
+    return null;
+  }
+}
+
+export function getAnalysesFromStorage() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error("Failed to get analyses from storage:", error);
+    return [];
+  }
+}
+
+export function deleteAnalysisFromStorage(id) {
+  try {
+    const analyses = getAnalysesFromStorage();
+    const filtered = analyses.filter((analysis) => analysis.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    return true;
+  } catch (error) {
+    console.error("Failed to delete analysis from storage:", error);
+    return false;
+  }
+}
+
+export function clearAllAnalyses() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    return true;
+  } catch (error) {
+    console.error("Failed to clear analyses from storage:", error);
+    return false;
+  }
+}
