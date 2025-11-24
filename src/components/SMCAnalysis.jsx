@@ -540,7 +540,7 @@ export default function SMCAnalysis({ rawResponse }) {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      marginBottom: ob.reasoning ? "8px" : "0",
+                      marginBottom: "8px",
                     }}
                   >
                     <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
@@ -559,6 +559,79 @@ export default function SMCAnalysis({ rawResponse }) {
                       {ob.strength || "Moderate"}
                     </span>
                   </div>
+                  {(ob.validity === "Likely Sustain" ||
+                    ob.validity === "Likely Fail") && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
+                        Validity
+                      </span>
+                      <span
+                        style={{
+                          color:
+                            ob.validity === "Likely Sustain"
+                              ? "#16a34a"
+                              : "#f59e0b",
+                          fontWeight: 600,
+                          padding: "4px 10px",
+                          background: "#0f172a",
+                          borderRadius: "4px",
+                          border:
+                            ob.validity === "Likely Sustain"
+                              ? "1px solid #16a34a"
+                              : "1px solid #f59e0b",
+                        }}
+                      >
+                        {ob.validity}
+                      </span>
+                    </div>
+                  )}
+                  {ob.liquidity_sweep_detected !== undefined && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: ob.reasoning ? "8px" : "0",
+                      }}
+                    >
+                      <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
+                        Liquidity Sweep
+                      </span>
+                      <span
+                        style={{
+                          color:
+                            ob.liquidity_sweep_detected === true ||
+                            ob.liquidity_sweep_detected === "true"
+                              ? "#3b82f6"
+                              : "#9ca3af",
+                          fontWeight: 600,
+                          padding: "4px 10px",
+                          background: "#0f172a",
+                          borderRadius: "4px",
+                          border:
+                            ob.liquidity_sweep_detected === true ||
+                            ob.liquidity_sweep_detected === "true"
+                              ? "1px solid #3b82f6"
+                              : "1px solid #6b7280",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {ob.liquidity_sweep_detected === true ||
+                        ob.liquidity_sweep_detected === "true"
+                          ? "Detected"
+                          : "Not Detected"}
+                      </span>
+                    </div>
+                  )}
                   {ob.reasoning && (
                     <div
                       style={{
@@ -663,7 +736,7 @@ export default function SMCAnalysis({ rawResponse }) {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      marginBottom: ob.reasoning ? "8px" : "0",
+                      marginBottom: "8px",
                     }}
                   >
                     <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
@@ -682,6 +755,79 @@ export default function SMCAnalysis({ rawResponse }) {
                       {ob.strength || "Moderate"}
                     </span>
                   </div>
+                  {(ob.validity === "Likely Sustain" ||
+                    ob.validity === "Likely Fail") && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
+                        Validity
+                      </span>
+                      <span
+                        style={{
+                          color:
+                            ob.validity === "Likely Sustain"
+                              ? "#16a34a"
+                              : "#f59e0b",
+                          fontWeight: 600,
+                          padding: "4px 10px",
+                          background: "#0f172a",
+                          borderRadius: "4px",
+                          border:
+                            ob.validity === "Likely Sustain"
+                              ? "1px solid #16a34a"
+                              : "1px solid #f59e0b",
+                        }}
+                      >
+                        {ob.validity}
+                      </span>
+                    </div>
+                  )}
+                  {ob.liquidity_sweep_detected !== undefined && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: ob.reasoning ? "8px" : "0",
+                      }}
+                    >
+                      <span style={{ color: "#9ca3af", fontSize: "0.85em" }}>
+                        Liquidity Sweep
+                      </span>
+                      <span
+                        style={{
+                          color:
+                            ob.liquidity_sweep_detected === true ||
+                            ob.liquidity_sweep_detected === "true"
+                              ? "#3b82f6"
+                              : "#9ca3af",
+                          fontWeight: 600,
+                          padding: "4px 10px",
+                          background: "#0f172a",
+                          borderRadius: "4px",
+                          border:
+                            ob.liquidity_sweep_detected === true ||
+                            ob.liquidity_sweep_detected === "true"
+                              ? "1px solid #3b82f6"
+                              : "1px solid #6b7280",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {ob.liquidity_sweep_detected === true ||
+                        ob.liquidity_sweep_detected === "true"
+                          ? "Detected"
+                          : "Not Detected"}
+                      </span>
+                    </div>
+                  )}
                   {ob.reasoning && (
                     <div
                       style={{

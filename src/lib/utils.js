@@ -50,12 +50,26 @@ export function parseAnalysis(text) {
       date: ob.date || "N/A",
       strength: ob.strength || "Moderate",
       reasoning: ob.reasoning || "",
+      validity:
+        ob.validity === "Likely Sustain" || ob.validity === "Likely Fail"
+          ? ob.validity
+          : null,
+      liquidity_sweep_detected:
+        ob.liquidity_sweep_detected === true ||
+        ob.liquidity_sweep_detected === "true",
     })),
     bearishOB: (jsonData.bearish_order_blocks || []).map((ob) => ({
       range: ob.range || "N/A",
       date: ob.date || "N/A",
       strength: ob.strength || "Moderate",
       reasoning: ob.reasoning || "",
+      validity:
+        ob.validity === "Likely Sustain" || ob.validity === "Likely Fail"
+          ? ob.validity
+          : null,
+      liquidity_sweep_detected:
+        ob.liquidity_sweep_detected === true ||
+        ob.liquidity_sweep_detected === "true",
     })),
     fvg: (jsonData.fair_value_gaps || []).map((fvg) => ({
       type: fvg.type || "Bullish",
