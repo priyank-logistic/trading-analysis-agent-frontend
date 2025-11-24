@@ -356,10 +356,10 @@ export default function Home() {
   const [animationComplete, setAnimationComplete] = useState(false);
   const abortControllerRef = useRef(null);
 
-  // const backendUrl = "https://ai.tradeonair.com/analyze";
-  // const cancelUrl = "https://ai.tradeonair.com/cancel";
-  const backendUrl = "http://localhost:8000/analyze";
-  const cancelUrl = "http://localhost:8000/cancel";
+  const backendUrl = "https://ai.tradeonair.com/analyze";
+  const cancelUrl = "https://ai.tradeonair.com/cancel";
+  // const backendUrl = "http://localhost:8000/analyze";
+  // const cancelUrl = "http://localhost:8000/cancel";
 
   const handleCancel = async () => {
     if (abortControllerRef.current) {
